@@ -41,7 +41,7 @@ def mainPage() {
         def childVer = "InitialSetup"
         if(childApps.size() > 0) {
             childVer = childApps.first().version()
-            log.debug "Using Child Version ${childApps.first().version()}"
+            //log.debug "Using Child Version ${childApps.first().version()}"
         }
         section("Create a new button device mapping.") {
             app(name: "childApps", appName: "ABC Child Creator", namespace: "paulsheldon", title: "New Button Device Mapping", multiple: true)
@@ -136,7 +136,7 @@ def aboutPage() {
   }
 
 def verImgCheck(childVer){
-    log.debug "Looking for Version ${childVer}"
+    //log.debug "Looking for Version ${childVer}"
 	def params = [
     	uri: "https://raw.githubusercontent.com/paulsheldon/SmartThings-PS/master/resources/abc/images/abc_${childVer}.png",
 	]
@@ -145,11 +145,11 @@ def verImgCheck(childVer){
         	resp.headers.each {
            	//log.debug "${it.name} : ${it.value}"
         	}
-            log.debug "ABC appears to be running the latest Version"
+            //log.debug "ABC appears to be running the latest Version"
         	return params.uri
     	}
 	} catch (e) {
-    	log.error "ABC does not appear to be the latest version: Please update from IDE ${childVer}"
+    	//log.error "ABC does not appear to be the latest version: Please update from IDE ${childVer}"
     	return "https://raw.githubusercontent.com/paulsheldon/SmartThings-PS/master/resources/abc/images/update.png"
 	}
 }

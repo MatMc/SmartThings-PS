@@ -170,14 +170,14 @@ private List getButtonResult(rawValue) {
     def buttonState = rawValue[4]
     def buttonHoldTime = rawValue[6]
     def hueStatus = (button as String) + "00" + (buttonState as String) // This is the state in the HUE api
-    log.info "Button: " + button + "  Hue Code: " + hueStatus + "  Hold Time: " + buttonHoldTime + "  Button State: " + buttonState
+    //log.info "Button: " + button + "  Hue Code: " + hueStatus + "  Hold Time: " + buttonHoldTime + "  Button State: " + buttonState
     //   result.data = ['buttonNumber': button]
 
     def buttonValue=["on","up","down", "off"]
     sendEvent(name: "buttonNames", value: buttonNames)
     def buttonName= (buttonNames)?   "$button" : buttonValue[button-1]
     def buttonTitle= buttonValue[button-1]
-    log.info "Button Names: $buttonNames : $buttonName"
+    //log.info "Button Names: $buttonNames : $buttonName"
 
     // The button is pressed, aka: pushed + released, with 0 hold time
     if ( buttonState == 0 ) {

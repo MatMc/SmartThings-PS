@@ -63,10 +63,10 @@ def chooseButton() {
         }
         if (buttonDevice) {
             state.buttonType = getButtonType(buttonDevice.typeName)
-            log.debug "Device Type is now set to: " + state.buttonType
+            //log.debug "Device Type is now set to: " + state.buttonType
             state.buttonCount = manualCount ?: buttonDevice.currentValue('numberOfButtons')
 
-            log.debug "Device has " + state.buttonCount + "Buttons."
+            //log.debug "Device has " + state.buttonCount + "Buttons."
             //if(state.buttonCount==null) state.buttonCount = buttonDevice.currentValue('numButtons')	//added for Kyse minimote(hopefully will be updated to correct attribute name)
             section("Step 2: Configure Buttons for Selected Device") {
                 if (state.buttonCount < 1) {
@@ -106,7 +106,7 @@ def configButtonsPage(params) {
 def getButtonSections(buttonNumber) {
     return {
         def picNameNoSpace = "${state.buttonType}${state.currentButton}.png" - " " - " " - " " - "/" - "-"
-        log.debug picNameNoSpace
+        //log.debug picNameNoSpace
         section() {    //"Hardware specific info on button selection:") {
             if (hwSpecifics == false) paragraph image: "https://raw.githubusercontent.com/paulsheldon/SmartThings-PS/master/resources/abc/images/${picNameNoSpace}", "${getSpecText()}"
         }
@@ -218,7 +218,7 @@ def updated() {
 }
 
 def initialize() {
-    log.debug "INITIALIZED with settings: ${settings}"
+    //log.debug "INITIALIZED with settings: ${settings}"
     app.label == app.name ? app.updateLabel(defaultLabel()) : app.updateLabel(app.label)
     subscribe(buttonDevice, "button", buttonEvent)
     state.lastshadesUp = true
@@ -273,7 +273,7 @@ def buttonEvent(evt) {
     if (allOk) {
         def buttonNumber = evt.jsonData.buttonNumber
         def pressType = evt.value
-        log.debug "$buttonDevice: Button $buttonNumber was $pressType"
+        //log.debug "$buttonDevice: Button $buttonNumber was $pressType"
         def preferenceNames = settings.findAll { it.key.contains("_${buttonNumber}_${pressType}") }
         preferenceNames.each { eachPref ->
             def prefDetail = getPrefDetails()?.find {
@@ -287,17 +287,17 @@ def buttonEvent(evt) {
 }
 
 def turnOn(devices) {
-    log.debug "Turning On: $devices"
+    //log.debug "Turning On: $devices"
     devices.on()
 }
 
 def turnOff(devices) {
-    log.debug "Turning Off: $devices"
+    //log.debug "Turning Off: $devices"
     devices.off()
 }
 
 def turnDim(devices, level) {
-    log.debug "Dimming (to $level): $devices"
+    //log.debug "Dimming (to $level): $devices"
     devices.setLevel(level)
 }
 
@@ -305,7 +305,7 @@ def turnDim(devices, level) {
     Fan
 */
 def adjustFan(device) {
-    log.debug "Adjusting: $device"
+    //log.debug "Adjusting: $device"
     def currentLevel = device.currentLevel
     if (device.currentSwitch == 'off') device.setLevel(15)
     else if (currentLevel < 34) device.setLevel(50)
@@ -318,7 +318,7 @@ def adjustFan(device) {
     Shade
 */
 def adjustShade(device) {
-    log.debug "Shades: $device = ${device.currentMotor} state.lastUP = $state.lastshadesUp"
+    //log.debug "Shades: $device = ${device.currentMotor} state.lastUP = $state.lastshadesUp"
     if (device.currentMotor in ["up", "down"]) {
         state.lastshadesUp = device.currentMotor == "up"
         device.stop()
@@ -334,23 +334,23 @@ def adjustShade(device) {
     Speaker Functions
 */
 def speakerPlayState(device) {
-	log.debug "Toggling Play/Pause: $device"
+	//log.debug "Toggling Play/Pause: $device"
 	if (sonos == true )	device.currentValue('playbackStatus').contains('playing')? device.pause() : device.play()
 	else device.currentValue('status').contains('playing') ? device.pause() : device.play()
 }
 
 def speakerNextTrack(device) {
-    log.debug "Next Track Sent to: $device"
+    //log.debug "Next Track Sent to: $device"
     device.nextTrack()
 }
 
 def speakerPreviousTrack(device) {
-	log.debug "Previous Track Sent to: $device"
+	//log.debug "Previous Track Sent to: $device"
 	device.previousTrack()
 }
 
 def speakerMute(device) {
-    log.debug "Toggling Mute/Unmute: $device"
+    //log.debug "Toggling Mute/Unmute: $device"
     device.currentValue('mute').contains('unmuted') ? device.mute() : device.unmute()
 }
 
@@ -358,47 +358,47 @@ def speakerMute(device) {
     Volume Control Functions
 */
 def volumeUp(device, incLevel) {
-    log.debug "Incrementing Volume by +$incLevel: $device"
+    //log.debug "Incrementing Volume by +$incLevel: $device"
     def currentVolume = (sonos == true) ? device.currentValue('volume')[0] : device.currentValue('level')[0] 
     //currentLevel return a list...[0] is first item in list ie volume level
     def newVolume = currentVolume.toInteger() + incLevel
     if (newVolume>100) newVolume=100
     if (sonos == true )	device.setVolume(newVolume)
     else device.setLevel(newVolume)
-    log.debug "Volume increased by $incLevel to $newVolume"
+    //log.debug "Volume increased by $incLevel to $newVolume"
 }
 
 def volumeDown(device, decLevel) {
-    log.debug "Decrementing Volume by -$decLevel: $device"
+    //log.debug "Decrementing Volume by -$decLevel: $device"
     def currentVolume = (sonos == true) ? device.currentValue('volume')[0] : device.currentValue('level')[0] 
     def newVolume = currentVolume.toInteger() - decLevel
     if (newVolume<0) newVolume=0
     if (sonos == true ) device.setVolume(newVolume)
     else device.setLevel(newVolume)
-    log.debug "Volume decreased by $decLevel to $newVolume"
+    //log.debug "Volume decreased by $decLevel to $newVolume"
 }
 
 /*
     Colour Functions
 */
 def colourTempUp(device, incTemp) {
-    log.debug "Incrementing Colour Temp: $device"
+    //log.debug "Incrementing Colour Temp: $device"
     def currentTemp = device.currentValue('colorTemperature')[0]
     def newTemp = currentTemp + incTemp > 6500 ? 6500 : currentTemp + incTemp
     device.setColorTemperature(newTemp)
     def colorTempName = colourTempName(newTemp)
     sendEvent(name: "colorName", value: colorTempName)
-    log.debug "Colour Temp Changed to $colorTempName"
+    //log.debug "Colour Temp Changed to $colorTempName"
 }
 
 def colourTempDown(device, decTemp) {
-    log.debug "Decrementing Colour Temp: $device"
+    //log.debug "Decrementing Colour Temp: $device"
     def currentTemp = device.currentValue('colorTemperature')[0]
     def newTemp = currentTemp - decTemp < 2200 ? 2200 : currentTemp - decTemp
     device.setColorTemperature(newTemp)
     def colorTempName = colourTempName(newTemp)
       sendEvent(name: "colorName", value: colorTempName)
-    log.debug "Colour Temp Changed to $colorTempName"
+    //log.debug "Colour Temp Changed to $colorTempName"
 }
 
 private colourTempName(value) {
@@ -413,31 +413,31 @@ private colourTempName(value) {
 }
 
 def levelUp(device, incLevel) {
-    log.debug "Incrementing Level by +$incLevel: $device"
+    //log.debug "Incrementing Level by +$incLevel: $device"
     def currentLevel = device.currentValue('level')[0]
     //currentLevel return a list...[0] is first item in list ie volume level
     def newLevel = currentLevel.toInteger() + incLevel
     if (newLevel>100) newLevel=100
     device.setLevel(newLevel)
-    log.debug "Level increased by $incLevel to $newLevel"
+    //log.debug "Level increased by $incLevel to $newLevel"
 }
 
 def levelDown(device, decLevel) {
-    log.debug "Decrementing Level by -$decLevel: $device"
+    //log.debug "Decrementing Level by -$decLevel: $device"
     def currentLevel = device.currentValue('level')[0]
     def newLevel = currentLevel.toInteger() - decLevel
     if (newLevel<1) newLevel=1 //Disable turning off light by dimming too low.
     device.setLevel(newLevel)
-    log.debug "Level decreased by $decLevel to $newLevel"
+    //log.debug "Level decreased by $decLevel to $newLevel"
 }
 
 def setUnlock(devices) {
-    log.debug "Locking: $devices"
+    //log.debug "Locking: $devices"
     devices.lock()
 }
 
 def toggle(devices) {
-    log.debug "Toggling: $devices"
+    //log.debug "Toggling: $devices"
     if (devices*.currentValue('switch').contains('on')) devices.off()
     else if (devices*.currentValue('switch').contains('off')) devices.on()
     else if (devices*.currentValue('alarm').contains('off')) devices.siren()
@@ -445,30 +445,30 @@ def toggle(devices) {
 }
 
 def dimToggle(devices, dimLevel) {
-    log.debug "Toggling On/Off | Dimming (to $dimLevel): $devices"
+    //log.debug "Toggling On/Off | Dimming (to $dimLevel): $devices"
     if (devices*.currentValue('switch').contains('on')) devices.off()
     else devices.setLevel(dimLevel)
 }
 
 def runRout(rout) {
-    log.debug "Running: $rout"
+    //log.debug "Running: $rout"
     location.helloHome.execute(rout)
 }
 
 def messageHandle(msg, inApp) {
     if (inApp == true) {
-        log.debug "Push notification sent"
+        //log.debug "Push notification sent"
         sendPush(msg)
     }
 }
 
 def smsHandle(phone, msg) {
-    log.debug "SMS sent"
+    //log.debug "SMS sent"
     sendSms(phone, msg ?: "No custom text entered on: $app.label")
 }
 
 def changeMode(mode) {
-    log.debug "Changing Mode to: $mode"
+    //log.debug "Changing Mode to: $mode"
     if (location.mode != mode && location.modes?.find { it.name == mode }) setLocationMode(mode)
 }
 
@@ -486,7 +486,7 @@ private getAllOk() {
 
 private getModeOk() {
     def result = !modes || modes.contains(location.mode)
-    log.trace "modeOk = $result"
+    //log.trace "modeOk = $result"
     result
 }
 
@@ -499,7 +499,7 @@ private getDaysOk() {
         def day = df.format(new Date())
         result = days.contains(day)
     }
-    log.trace "daysOk = $result"
+    //log.trace "daysOk = $result"
     result
 }
 
@@ -511,7 +511,7 @@ private getTimeOk() {
         def stop = timeToday(ending).time
         result = start < stop ? currTime >= start && currTime <= stop : currTime <= stop || currTime >= start
     }
-    log.trace "timeOk = $result"
+    //log.trace "timeOk = $result"
     result
 }
 

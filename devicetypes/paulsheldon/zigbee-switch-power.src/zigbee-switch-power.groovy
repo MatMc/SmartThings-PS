@@ -53,13 +53,13 @@ metadata {
 
 // Parse incoming device messages to generate events
 def parse(String description) {
-    log.debug "description is $description"
+    //log.debug "description is $description"
 
     def resultMap = zigbee.getKnownDescription(description)
     if (resultMap) {
-        log.info resultMap
+        //log.info resultMap
         if (resultMap.type == "update") {
-            log.info "$device updates: ${resultMap.value}"
+            //log.info "$device updates: ${resultMap.value}"
         }
         else if (resultMap.type == "power") {
             def powerValue
@@ -73,8 +73,8 @@ def parse(String description) {
         }
     }
     else {
-        log.warn "DID NOT PARSE MESSAGE for description : $description"
-        log.debug zigbee.parseDescriptionAsMap(description)
+        //log.warn "DID NOT PARSE MESSAGE for description : $description"
+        //log.debug zigbee.parseDescriptionAsMap(description)
     }
 }
 
@@ -91,6 +91,6 @@ def refresh() {
 }
 
 def configure() {
-    log.debug "Configuring Reporting and Bindings."
+    //log.debug "Configuring Reporting and Bindings."
     zigbee.onOffConfig() + zigbee.simpleMeteringPowerConfig() + zigbee.electricMeasurementPowerConfig() + zigbee.onOffRefresh() + zigbee.simpleMeteringPowerRefresh() + zigbee.electricMeasurementPowerRefresh()
 }

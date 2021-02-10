@@ -94,7 +94,7 @@ metadata {
 		// Main multi
 		multiAttributeTile(name:"multi", type:"thermostat", width:6, height:4) {
 			tileAttribute("device.temperature", key: "PRIMARY_CONTROL") {
-				attributeState("default", label:'${currentValue}°', unit:"C")
+				attributeState("default", label:'${currentValue}ï¿½', unit:"C")
 			}
 			// Up and Down buttons:
 			//tileAttribute("device.temperature", key: "VALUE_CONTROL") {
@@ -129,7 +129,7 @@ metadata {
 	
 		// temperature tile:
 		valueTile("temperature", "device.temperature", width: 2, height: 2, canChangeIcon: true) {
-			state("temperature", label:'${currentValue}°', unit:"C", icon:"st.Weather.weather2",
+			state("temperature", label:'${currentValue}ï¿½', unit:"C", icon:"st.Weather.weather2",
 					backgroundColors:[
 							// Celsius
 							[value: 0, color: "#153591"],
@@ -145,7 +145,7 @@ metadata {
 		
 		// thermostatSetpoint tiles:
 		valueTile("thermostatSetpoint", "device.thermostatSetpoint", width: 3, height: 1) {
-			state "thermostatSetpoint", label:'Setpoint: ${currentValue}°', unit:"C"
+			state "thermostatSetpoint", label:'Setpoint: ${currentValue}ï¿½', unit:"C"
 		}
 		valueTile("thermostatSetpointStatus", "device.thermostatSetpointStatus", width: 3, height: 1, decoration: "flat") {
 			state "thermostatSetpointStatus", label:'${currentValue}', backgroundColor:"#ffffff"
@@ -271,7 +271,7 @@ def test() {
  **/
 def installed() {
 
-	log.debug "${app.label}: Installed with settings: ${settings}"
+	//log.debug "${app.label}: Installed with settings: ${settings}"
 
 	state.installedAt = now()
 	
@@ -301,7 +301,7 @@ def installed() {
  **/
 def updated() {
 
-	if (state.debug) log.debug "${device.label}: Updating with settings: ${settings}"
+	//if (state.debug) log.debug "${device.label}: Updating with settings: ${settings}"
 
 	// Copy input values to state:
 	state.setpointMode = settings.prefSetpointMode
@@ -324,7 +324,7 @@ def updated() {
  **/
 void generateEvent(values) {
 
-	log.info "${device.label}: generateEvent(): New values: ${values}"
+	//log.info "${device.label}: generateEvent(): New values: ${values}"
 	
 	if(values) {
 		values.each { name, value ->
@@ -383,7 +383,7 @@ void generateEvent(values) {
  **/
 void poll() {
 
-	if (state.debug) log.debug "${device.label}: poll()"
+	//if (state.debug) log.debug "${device.label}: poll()"
 	parent.poll(state.zoneId)
 }
 
@@ -395,7 +395,7 @@ void poll() {
  **/
 void refresh() {
 
-	if (state.debug) log.debug "${device.label}: refresh()"
+	//if (state.debug) log.debug "${device.label}: refresh()"
 	sendEvent(name: 'thermostatSetpointStatus', value: 'Updating', displayed: false)
 	parent.poll(state.zoneId)
 }
@@ -430,7 +430,7 @@ void refresh() {
  **/
 def setThermostatMode(String mode, until=-1) {
 
-	log.info "${device.label}: setThermostatMode(Mode: ${mode}, Until: ${until})"
+	//log.info "${device.label}: setThermostatMode(Mode: ${mode}, Until: ${until})"
 	
 	// Send update via parent:
 	if (!parent.setThermostatMode(state.systemId, mode, until)) {
@@ -441,7 +441,7 @@ def setThermostatMode(String mode, until=-1) {
 		return null
 	}
 	else {
-		log.error "${device.label}: setThermostatMode(): Error: Unable to set thermostat mode."
+		//log.error "${device.label}: setThermostatMode(): Error: Unable to set thermostat mode."
 		return 'error'
 	}
 }
@@ -476,16 +476,16 @@ def setThermostatMode(String mode, until=-1) {
  **/
 def setHeatingSetpoint(setpoint, until=-1) {
 
-	if (state.debug) log.debug "${device.label}: setHeatingSetpoint(Setpoint: ${setpoint}, Until: ${until})"
+	//if (state.debug) log.debug "${device.label}: setHeatingSetpoint(Setpoint: ${setpoint}, Until: ${until})"
 	
 	// Clean setpoint:
 	setpoint = formatTemperature(setpoint)
 	if (Float.parseFloat(setpoint) < Float.parseFloat(state.minHeatingSetpoint)) {
-		log.warn "${device.label}: setHeatingSetpoint(): Specified setpoint (${setpoint}) is less than zone's minimum setpoint (${state.minHeatingSetpoint})."
+		//log.warn "${device.label}: setHeatingSetpoint(): Specified setpoint (${setpoint}) is less than zone's minimum setpoint (${state.minHeatingSetpoint})."
 		setpoint = state.minHeatingSetpoint
 	}
 	else if (Float.parseFloat(setpoint) > Float.parseFloat(state.maxHeatingSetpoint)) {
-		log.warn "${device.label}: setHeatingSetpoint(): Specified setpoint (${setpoint}) is greater than zone's maximum setpoint (${state.maxHeatingSetpoint})."
+		//log.warn "${device.label}: setHeatingSetpoint(): Specified setpoint (${setpoint}) is greater than zone's maximum setpoint (${state.maxHeatingSetpoint})."
 		setpoint = state.maxHeatingSetpoint
 	}
 	
@@ -514,7 +514,7 @@ def setHeatingSetpoint(setpoint, until=-1) {
 				// settings.prefSetpointTime appears to return an ISO dateformat string.
 				// However using an input of type "time" causes HTTP 500 errors in the IDE, so disabled for now.
 				// If time has passed, then need to make it the next day.
-				if (state.debug) log.debug "${device.label}: setHeatingSetpoint(): Time: ${state.SetpointTime}"
+				//if (state.debug) log.debug "${device.label}: setHeatingSetpoint(): Time: ${state.SetpointTime}"
 	        	until = 'nextSwitchpoint'
 	            break
 	    	case 'Permanent':
@@ -551,11 +551,11 @@ def setHeatingSetpoint(setpoint, until=-1) {
 		untilRes = new Date( now() + (Math.round(until) * 60000) )
 	}
 	else {
-		log.warn "${device.label}: setHeatingSetpoint(): until value could not be parsed. Setpoint will be applied permanently."
+		//log.warn "${device.label}: setHeatingSetpoint(): until value could not be parsed. Setpoint will be applied permanently."
 		untilRes = 0
 	}
 	
-	log.info "${device.label}: setHeatingSetpoint(): Setting setpoint to: ${setpoint} until: ${untilRes}"
+	//log.info "${device.label}: setHeatingSetpoint(): Setting setpoint to: ${setpoint} until: ${untilRes}"
 	
 	// Send update via parent:
 	if (!parent.setHeatingSetpoint(state.zoneId, setpoint, untilRes)) {
@@ -574,7 +574,7 @@ def setHeatingSetpoint(setpoint, until=-1) {
 		return null
 	}
 	else {
-		log.error "${device.label}: setHeatingSetpoint(): Error: Unable to set heating setpoint."
+		//log.error "${device.label}: setHeatingSetpoint(): Error: Unable to set heating setpoint."
 		return 'error'
 	}
 }
@@ -590,7 +590,7 @@ def setHeatingSetpoint(setpoint, until=-1) {
  **/
 def clearHeatingSetpoint() {
 
-	log.info "${device.label}: clearHeatingSetpoint()"
+	//log.info "${device.label}: clearHeatingSetpoint()"
 
 	// Send update via parent:
 	if (!parent.clearHeatingSetpoint(state.zoneId)) {
@@ -605,7 +605,7 @@ def clearHeatingSetpoint() {
 		return null
 	}
 	else {
-		log.error "${device.label}: clearHeatingSetpoint(): Error: Unable to clear heating setpoint."
+		//log.error "${device.label}: clearHeatingSetpoint(): Error: Unable to clear heating setpoint."
 		return 'error'
 	}
 }
@@ -622,7 +622,7 @@ def clearHeatingSetpoint() {
  **/
 void raiseSetpoint() {
 
-	if (state.debug) log.debug "${device.label}: raiseSetpoint()"
+	//if (state.debug) log.debug "${device.label}: raiseSetpoint()"
 	
 	def mode = device.currentValue("thermostatMode")
 	def targetSp = new BigDecimal(state.targetSetpoint)
@@ -630,7 +630,7 @@ void raiseSetpoint() {
 	def maxSp = new BigDecimal(state.maxHeatingSetpoint)
 	
 	if ('off' == mode || 'away' == mode) {
-		log.warn "${device.label}: raiseSetpoint(): thermostat mode (${mode}) does not allow altering the temperature setpoint."
+		//log.warn "${device.label}: raiseSetpoint(): thermostat mode (${mode}) does not allow altering the temperature setpoint."
 	}
 	else {
 		targetSp += tempRes
@@ -640,7 +640,7 @@ void raiseSetpoint() {
 		}
 		
 		state.targetSetpoint = targetSp
-		log.info "${device.label}: raiseSetpoint(): Target setpoint raised to: ${targetSp}"
+		//log.info "${device.label}: raiseSetpoint(): Target setpoint raised to: ${targetSp}"
 		sendEvent(name: 'thermostatSetpointStatus', value: 'Updating', displayed: false)
 		runIn(3, "alterSetpoint", [overwrite: true]) // Wait three seconds in case targetSetpoint is changed again.
 	}
@@ -659,7 +659,7 @@ void raiseSetpoint() {
  **/
 void lowerSetpoint() {
 
-	if (state.debug) log.debug "${device.label}: lowerSetpoint()"
+	//if (state.debug) log.debug "${device.label}: lowerSetpoint()"
 	
 	def mode = device.currentValue("thermostatMode")
 	def targetSp = new BigDecimal(state.targetSetpoint)
@@ -667,7 +667,7 @@ void lowerSetpoint() {
 	def minSp = new BigDecimal(state.minHeatingSetpoint)
 	
 	if ('off' == mode || 'away' == mode) {
-		log.warn "${device.label}: lowerSetpoint(): thermostat mode (${mode}) does not allow altering the temperature setpoint."
+		//log.warn "${device.label}: lowerSetpoint(): thermostat mode (${mode}) does not allow altering the temperature setpoint."
 	}
 	else {
 		targetSp -= tempRes 
@@ -677,7 +677,7 @@ void lowerSetpoint() {
 		}
 		
 		state.targetSetpoint = targetSp
-		log.info "${device.label}: lowerSetpoint(): Target setpoint lowered to: ${targetSp}"
+		//log.info "${device.label}: lowerSetpoint(): Target setpoint lowered to: ${targetSp}"
 		sendEvent(name: 'thermostatSetpointStatus', value: 'Updating', displayed: false)
 		runIn(3, "alterSetpoint", [overwrite: true]) // Wait three seconds in case targetSetpoint is changed again.
 	}
@@ -694,7 +694,7 @@ void lowerSetpoint() {
  **/
 private alterSetpoint() {
 
-	if (state.debug) log.debug "${device.label}: alterSetpoint()"
+	//if (state.debug) log.debug "${device.label}: alterSetpoint()"
 	
 	setHeatingSetpoint(state.targetSetpoint)
 }
@@ -706,52 +706,52 @@ private alterSetpoint() {
  **********************************************************************/
 
 void resume() {
-	if (state.debug) log.debug "${device.label}: resume()"
+	//if (state.debug) log.debug "${device.label}: resume()"
 	clearHeatingSetpoint()
 }
 
 void auto() {
-	if (state.debug) log.debug "${device.label}: auto()"
+	//if (state.debug) log.debug "${device.label}: auto()"
 	setThermostatMode('auto')
 }
 
 void heat() {
-	if (state.debug) log.debug "${device.label}: heat()"
+	//if (state.debug) log.debug "${device.label}: heat()"
 	setThermostatMode('auto')
 }
 
 void off() {
-	if (state.debug) log.debug "${device.label}: off()"
+	//if (state.debug) log.debug "${device.label}: off()"
 	setThermostatMode('off')
 }
 
 void away(until=-1) {
-	if (state.debug) log.debug "${device.label}: away()"
+	//if (state.debug) log.debug "${device.label}: away()"
 	setThermostatMode('away', until)
 }
 
 void custom(until=-1) {
-	if (state.debug) log.debug "${device.label}: custom()"
+	//if (state.debug) log.debug "${device.label}: custom()"
 	setThermostatMode('custom', until)
 }
 
 void dayOff(until=-1) {
-	if (state.debug) log.debug "${device.label}: dayOff()"
+	//if (state.debug) log.debug "${device.label}: dayOff()"
 	setThermostatMode('dayOff', until)
 }
 
 void economy(until=-1) {
-	if (state.debug) log.debug "${device.label}: economy()"
+	//if (state.debug) log.debug "${device.label}: economy()"
 	setThermostatMode('economy', until)
 }
 
 void boost() {
-	if (state.debug) log.debug "${device.label}: boost()"
+	//if (state.debug) log.debug "${device.label}: boost()"
 	setHeatingSetpoint(state.boostTemperature)
 }
 
 void suppress() {
-	if (state.debug) log.debug "${device.label}: suppress()"
+	//if (state.debug) log.debug "${device.label}: suppress()"
 	setHeatingSetpoint(state.suppressTemperature)
 }
 
@@ -781,7 +781,7 @@ private pseudoSleep(ms) {
  **/
 private getInputDefaultValue(inputName) {
 
-	if (state.debug) log.debug "${device.label}: getInputDefaultValue()"
+	//if (state.debug) log.debug "${device.label}: getInputDefaultValue()"
 	
 	def returnValue
 	properties.preferences?.sections.each { section ->
@@ -819,7 +819,7 @@ private formatTemperature(t) {
  **/
 private formatThermostatModeForDisp(mode) {
 
-	if (state.debug) log.debug "${device.label}: formatThermostatModeForDisp()"
+	//if (state.debug) log.debug "${device.label}: formatThermostatModeForDisp()"
 
 	switch (mode) {
 		case 'auto':
@@ -857,7 +857,7 @@ private formatThermostatModeForDisp(mode) {
  **/
 private calculateThermostatOperatingState() {
 
-	if (state.debug) log.debug "${device.label}: calculateThermostatOperatingState()"
+	//if (state.debug) log.debug "${device.label}: calculateThermostatOperatingState()"
 
 	def tOS
 	if ('off' == device.currentValue('thermostatMode')) {
@@ -885,7 +885,7 @@ private calculateThermostatOperatingState() {
  **/
 private calculateOptimisations() {
 
-	if (state.debug) log.debug "${device.label}: calculateOptimisations()"
+	//if (state.debug) log.debug "${device.label}: calculateOptimisations()"
 
 	def newOptValue = 'inactive'
 	def newWdfValue = 'inactive'
@@ -931,7 +931,7 @@ private calculateOptimisations() {
  **/
 private calculateThermostatStatus() {
 
-	if (state.debug) log.debug "${device.label}: calculateThermostatStatus()"
+	//if (state.debug) log.debug "${device.label}: calculateThermostatStatus()"
 
 	def newThermostatStatus = ''
 	def thermostatModeDisp = formatThermostatModeForDisp(device.currentValue('thermostatMode'))
@@ -941,7 +941,7 @@ private calculateThermostatStatus() {
 		newThermostatStatus = 'Off'
 	}
 	else if('heating' == device.currentValue('thermostatOperatingState')) {
-		newThermostatStatus = "Heating to ${setpoint}° (${thermostatModeDisp})"
+		newThermostatStatus = "Heating to ${setpoint}ï¿½ (${thermostatModeDisp})"
 	}
 	else {
 		newThermostatStatus = "Idle (${thermostatModeDisp})"
@@ -963,7 +963,7 @@ private calculateThermostatStatus() {
  **/
 private calculateThermostatSetpointStatus() {
 
-	if (state.debug) log.debug "${device.label}: calculateThermostatSetpointStatus()"
+	//if (state.debug) log.debug "${device.label}: calculateThermostatSetpointStatus()"
 
 	def newThermostatSetpointStatus = ''
 	def setpointMode = device.currentValue('thermostatSetpointMode')

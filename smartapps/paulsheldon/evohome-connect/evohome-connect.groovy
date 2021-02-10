@@ -90,7 +90,7 @@ preferences {
 def installed() {
 
 	atomicState.installedAt = now()
-	log.debug "${app.label}: Installed with settings: ${settings}"
+	//log.debug "${app.label}: Installed with settings: ${settings}"
 
 }
 
@@ -116,7 +116,7 @@ def uninstalled() {
  **/
 void updated() {
 
-	if (atomicState.debug) log.debug "${app.label}: Updating with settings: ${settings}"
+	//if (atomicState.debug) log.debug "${app.label}: Updating with settings: ${settings}"
 
 	// General:
 	atomicState.debug = settings.prefDebugMode
@@ -167,7 +167,7 @@ void updated() {
  **/
 void manageSchedules() {
 
-	if (atomicState.debug) log.debug "${app.label}: manageSchedules()"
+	//if (atomicState.debug) log.debug "${app.label}: manageSchedules()"
 
 	// Generate a random offset (1-60):
 	Random rand = new Random(now())
@@ -175,7 +175,7 @@ void manageSchedules() {
 	
 	// manageAuth (every 5 mins):
 	if (1==1) { // To Do: Test if schedule has actually stalled.
-		if (atomicState.debug) log.debug "${app.label}: manageSchedules(): Re-scheduling manageAuth()"
+		//if (atomicState.debug) log.debug "${app.label}: manageSchedules(): Re-scheduling manageAuth()"
 		try {
 			unschedule(manageAuth)
 		}
@@ -188,7 +188,7 @@ void manageSchedules() {
 
 	// poll():
 	if (1==1) { // To Do: Test if schedule has actually stalled.
-		if (atomicState.debug) log.debug "${app.label}: manageSchedules(): Re-scheduling poll()"
+		//if (atomicState.debug) log.debug "${app.label}: manageSchedules(): Re-scheduling poll()"
 		try {
 			unschedule(poll)
 		}
@@ -209,7 +209,7 @@ void manageSchedules() {
  **/
 void manageSubscriptions() {
 
-	if (atomicState.debug) log.debug "${app.label}: manageSubscriptions()"
+	//if (atomicState.debug) log.debug "${app.label}: manageSubscriptions()"
 
 	// Unsubscribe:
 	unsubscribe()
@@ -232,22 +232,22 @@ void manageSubscriptions() {
  **/
 void manageAuth() {
 
-	if (atomicState.debug) log.debug "${app.label}: manageAuth()"
+	//if (atomicState.debug) log.debug "${app.label}: manageAuth()"
 
 	// Check if Auth Token is valid, if not authenticate:
 	if (!atomicState.evohomeAuth.authToken) {
 	
-		log.info "${app.label}: manageAuth(): No Auth Token. Authenticating..."
+		//log.info "${app.label}: manageAuth(): No Auth Token. Authenticating..."
 		authenticate()
 	}
 	else if (atomicState.evohomeAuthFailed) {
 	
-		log.info "${app.label}: manageAuth(): Auth has failed. Authenticating..."
+		//log.info "${app.label}: manageAuth(): Auth has failed. Authenticating..."
 		authenticate()
 	}
 	else if (!atomicState.evohomeAuth.expiresAt.isNumber() || now() >= atomicState.evohomeAuth.expiresAt) {
 	
-		log.info "${app.label}: manageAuth(): Auth Token has expired. Authenticating..."
+		//log.info "${app.label}: manageAuth(): Auth Token has expired. Authenticating..."
 		authenticate()
 	}
 	else {		
@@ -255,11 +255,11 @@ void manageAuth() {
 		def refreshAt = atomicState.evohomeAuth.expiresAt - ( 1000 * (atomicState.evohomeAuth.tokenLifetime * atomicState.evohomeAuth.tokenLifetimePercentThreshold / 100))
 		
 		if (now() >= refreshAt) {
-			log.info "${app.label}: manageAuth(): Auth Token needs to be refreshed before it expires."
+			//log.info "${app.label}: manageAuth(): Auth Token needs to be refreshed before it expires."
 			refreshAuthToken()
 		}
 		else {
-			log.info "${app.label}: manageAuth(): Auth Token is okay."		
+			//log.info "${app.label}: manageAuth(): Auth Token is okay."
 		}
 	}
 
@@ -288,7 +288,7 @@ void manageAuth() {
  **/
 void poll(onlyZoneId=-1) {
 
-	if (atomicState.debug) log.debug "${app.label}: poll(${onlyZoneId})"
+	//if (atomicState.debug) log.debug "${app.label}: poll(${onlyZoneId})"
 	
 	// Check if there's been an authentication failure:
 	if (atomicState.evohomeAuthFailed) {
@@ -340,7 +340,7 @@ void poll(onlyZoneId=-1) {
  **/
 void handleAppTouch(evt) {
 
-	if (atomicState.debug) log.debug "${app.label}: handleAppTouch()"
+	//if (atomicState.debug) log.debug "${app.label}: handleAppTouch()"
 
 	//manageAuth()
 	//manageSchedules()
@@ -366,7 +366,7 @@ void handleAppTouch(evt) {
  **/
 void updateChildDeviceConfig() {
 
-	if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig()"
+	//if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig()"
 	
 	// Build list of active DNIs, any existing children with DNIs not in here will be deleted.
 	def activeDnis = []
@@ -398,10 +398,10 @@ void updateChildDeviceConfig() {
 					if(!d) {
 						try {
 							values.put('label', "${zone.name} Heating Zone (Evohome)")
-							log.info "${app.label}: updateChildDeviceConfig(): Creating device: Name: ${values.label},  DNI: ${dni}"
+							//log.info "${app.label}: updateChildDeviceConfig(): Creating device: Name: ${values.label},  DNI: ${dni}"
 		                   	d = addChildDevice(app.namespace, "Evohome Heating Zone", dni, null, values)
 						} catch (e) {
-							log.error "${app.label}: updateChildDeviceConfig(): Error creating device: Name: ${values.label}, DNI: ${dni}, Error: ${e}"
+							//log.error "${app.label}: updateChildDeviceConfig(): Error creating device: Name: ${values.label}, DNI: ${dni}, Error: ${e}"
 						}
 					} 
 					
@@ -413,20 +413,20 @@ void updateChildDeviceConfig() {
 		}
 	}
 	
-	if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig(): Active DNIs: ${activeDnis}"
+	//if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig(): Active DNIs: ${activeDnis}"
 	
 	// Delete Devices:
 	def delete = getChildDevices().findAll { !activeDnis.contains(it.deviceNetworkId) }
 	
-	if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig(): Found ${delete.size} devices to delete."
+	//if (atomicState.debug) log.debug "${app.label}: updateChildDeviceConfig(): Found ${delete.size} devices to delete."
 
 	delete.each {
-		log.info "${app.label}: updateChildDeviceConfig(): Deleting device with DNI: ${it.deviceNetworkId}"
+		//log.info "${app.label}: updateChildDeviceConfig(): Deleting device with DNI: ${it.deviceNetworkId}"
 		try {
 			deleteChildDevice(it.deviceNetworkId)
 		}
 		catch(e) {
-			log.error "${app.label}: updateChildDeviceConfig(): Error deleting device with DNI: ${it.deviceNetworkId}. Error: ${e}"
+			//log.error "${app.label}: updateChildDeviceConfig(): Error deleting device with DNI: ${it.deviceNetworkId}. Error: ${e}"
 		}
 	}
 }
@@ -446,7 +446,7 @@ void updateChildDeviceConfig() {
  **/
 void updateChildDevice(onlyZoneId=-1) {
 
-	if (atomicState.debug) log.debug "${app.label}: updateChildDevice(${onlyZoneId})"
+	//if (atomicState.debug) log.debug "${app.label}: updateChildDevice(${onlyZoneId})"
 	
 	atomicState.evohomeStatus.each { loc ->
 		loc.gateways.each { gateway ->
@@ -473,10 +473,10 @@ void updateChildDevice(onlyZoneId=-1) {
 								'nextScheduledSetpoint': formatTemperature(nextSw.temperature),
 								'nextScheduledTime': nextSw.time
 							]
-							if (atomicState.debug) log.debug "${app.label}: updateChildDevice(): Updating Device with DNI: ${dni} with data: ${values}"
+							//if (atomicState.debug) log.debug "${app.label}: updateChildDevice(): Updating Device with DNI: ${dni} with data: ${values}"
 							d.generateEvent(values)
 						} else {
-							if (atomicState.debug) log.debug "${app.label}: updateChildDevice(): Device with DNI: ${dni} does not exist, so skipping status update."
+							//if (atomicState.debug) log.debug "${app.label}: updateChildDevice(): Device with DNI: ${dni} does not exist, so skipping status update."
 						}
 					}
 				}
@@ -498,7 +498,7 @@ void updateChildDevice(onlyZoneId=-1) {
  **/
 private authenticate() {
 
-	if (atomicState.debug) log.debug "${app.label}: authenticate()"
+	//if (atomicState.debug) log.debug "${app.label}: authenticate()"
 	
 	def requestParams = [
 		method: 'POST',
@@ -531,9 +531,9 @@ private authenticate() {
 				atomicState.evohomeAuth = tmpAuth
 				atomicState.evohomeAuthFailed = false
 				
-				if (atomicState.debug) log.debug "${app.label}: authenticate(): New evohomeAuth: ${atomicState.evohomeAuth}"
+				//if (atomicState.debug) log.debug "${app.label}: authenticate(): New evohomeAuth: ${atomicState.evohomeAuth}"
 				def exp = new Date(tmpAuth.expiresAt)
-				log.info "${app.label}: authenticate(): New Auth Token Expires At: ${exp}"
+				//log.info "${app.label}: authenticate(): New Auth Token Expires At: ${exp}"
 
 				// Update evohomeHeaders:
 				def tmpHeaders = atomicState.evohomeHeaders ?: [:]
@@ -542,18 +542,18 @@ private authenticate() {
 					tmpHeaders.put('Accept', 'application/json, application/xml, text/json, text/x-json, text/javascript, text/xml')
 				atomicState.evohomeHeaders = tmpHeaders
 				
-				if (atomicState.debug) log.debug "${app.label}: authenticate(): New evohomeHeaders: ${atomicState.evohomeHeaders}"
+				//if (atomicState.debug) log.debug "${app.label}: authenticate(): New evohomeHeaders: ${atomicState.evohomeHeaders}"
 				
 				// Now get User Account info:
 				getEvohomeUserAccount()
 			}
 			else {
-				log.error "${app.label}: authenticate(): No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: authenticate(): No Data. Response Status: ${resp.status}"
 				atomicState.evohomeAuthFailed = true
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: authenticate(): Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: authenticate(): Error: e.statusCode ${e.statusCode}"
 		atomicState.evohomeAuthFailed = true
 	}
 	
@@ -570,7 +570,7 @@ private authenticate() {
  **/
 private refreshAuthToken() {
 
-	if (atomicState.debug) log.debug "${app.label}: refreshAuthToken()"
+	//if (atomicState.debug) log.debug "${app.label}: refreshAuthToken()"
 
 	def requestParams = [
 		method: 'POST',
@@ -602,9 +602,9 @@ private refreshAuthToken() {
 				atomicState.evohomeAuth = tmpAuth
 				atomicState.evohomeAuthFailed = false
 				
-				if (atomicState.debug) log.debug "${app.label}: refreshAuthToken(): New evohomeAuth: ${atomicState.evohomeAuth}"
+				//if (atomicState.debug) log.debug "${app.label}: refreshAuthToken(): New evohomeAuth: ${atomicState.evohomeAuth}"
 				def exp = new Date(tmpAuth.expiresAt)
-				log.info "${app.label}: refreshAuthToken(): New Auth Token Expires At: ${exp}"
+				//log.info "${app.label}: refreshAuthToken(): New Auth Token Expires At: ${exp}"
 
 				// Update evohomeHeaders:
 				def tmpHeaders = atomicState.evohomeHeaders ?: [:]
@@ -613,17 +613,17 @@ private refreshAuthToken() {
 					tmpHeaders.put('Accept', 'application/json, application/xml, text/json, text/x-json, text/javascript, text/xml')
 				atomicState.evohomeHeaders = tmpHeaders
 				
-				if (atomicState.debug) log.debug "${app.label}: refreshAuthToken(): New evohomeHeaders: ${atomicState.evohomeHeaders}"
+				//if (atomicState.debug) log.debug "${app.label}: refreshAuthToken(): New evohomeHeaders: ${atomicState.evohomeHeaders}"
 				
 				// Now get User Account info:
 				getEvohomeUserAccount()
 			}
 			else {
-				log.error "${app.label}: refreshAuthToken(): No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: refreshAuthToken(): No Data. Response Status: ${resp.status}"
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: refreshAuthToken(): Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: refreshAuthToken(): Error: e.statusCode ${e.statusCode}"
 		// If Unauthorized (401) then re-authenticate:
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
@@ -642,7 +642,7 @@ private refreshAuthToken() {
  **/
 private getEvohomeUserAccount() {
 
-	log.info "${app.label}: getEvohomeUserAccount(): Getting user account information."
+	//log.info "${app.label}: getEvohomeUserAccount(): Getting user account information."
 	
 	def requestParams = [
 		method: 'GET',
@@ -655,14 +655,14 @@ private getEvohomeUserAccount() {
 		httpGet(requestParams) { resp ->
 			if (resp.status == 200 && resp.data) {
 				atomicState.evohomeUserAccount = resp.data
-				if (atomicState.debug) log.debug "${app.label}: getEvohomeUserAccount(): Data: ${atomicState.evohomeUserAccount}"
+				//if (atomicState.debug) log.debug "${app.label}: getEvohomeUserAccount(): Data: ${atomicState.evohomeUserAccount}"
 			}
 			else {
-				log.error "${app.label}: getEvohomeUserAccount(): No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: getEvohomeUserAccount(): No Data. Response Status: ${resp.status}"
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: getEvohomeUserAccount(): Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: getEvohomeUserAccount(): Error: e.statusCode ${e.statusCode}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -679,7 +679,7 @@ private getEvohomeUserAccount() {
  **/
 private getEvohomeConfig() {
 
-	log.info "${app.label}: getEvohomeConfig(): Getting configuration for all locations."
+	//log.info "${app.label}: getEvohomeConfig(): Getting configuration for all locations."
 
 	def requestParams = [
 		method: 'GET',
@@ -695,18 +695,18 @@ private getEvohomeConfig() {
 	try {
 		httpGet(requestParams) { resp ->
 			if (resp.status == 200 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: getEvohomeConfig(): Data: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: getEvohomeConfig(): Data: ${resp.data}"
 				atomicState.evohomeConfig = resp.data
 				atomicState.evohomeConfigUpdatedAt = now()
 				return null
 			}
 			else {
-				log.error "${app.label}: getEvohomeConfig(): No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: getEvohomeConfig(): No Data. Response Status: ${resp.status}"
 				return 'error'
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: getEvohomeConfig(): Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: getEvohomeConfig(): Error: e.statusCode ${e.statusCode}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -724,13 +724,13 @@ private getEvohomeConfig() {
  **/
 private getEvohomeStatus(onlyZoneId=-1) {
 
-	if (atomicState.debug) log.debug "${app.label}: getEvohomeStatus(${onlyZoneId})"
+	//if (atomicState.debug) log.debug "${app.label}: getEvohomeStatus(${onlyZoneId})"
 	
 	def newEvohomeStatus = []
 	
 	if (onlyZoneId == -1) { // Update all zones (which can be obtained en-masse for each location):
 		
-		log.info "${app.label}: getEvohomeStatus(): Getting status for all zones."
+		//log.info "${app.label}: getEvohomeStatus(): Getting status for all zones."
 		
 		atomicState.evohomeConfig.each { loc ->
 			def locStatus = getEvohomeLocationStatus(loc.locationInfo.locationId)
@@ -747,7 +747,7 @@ private getEvohomeStatus(onlyZoneId=-1) {
 	}
 	else { // Only update the specified zone:
 		
-		log.info "${app.label}: getEvohomeStatus(): Getting status for zone ID: ${onlyZoneId}"
+		//log.info "${app.label}: getEvohomeStatus(): Getting status for zone ID: ${onlyZoneId}"
 		
 		def newZoneStatus = getEvohomeZoneStatus(onlyZoneId)
 		if (newZoneStatus) {
@@ -786,7 +786,7 @@ private getEvohomeStatus(onlyZoneId=-1) {
  **/
 private getEvohomeLocationStatus(locationId) {
 
-	if (atomicState.debug) log.debug "${app.label}: getEvohomeLocationStatus: Location ID: ${locationId}"
+	//if (atomicState.debug) log.debug "${app.label}: getEvohomeLocationStatus: Location ID: ${locationId}"
 	
 	def requestParams = [
 		'method': 'GET',
@@ -799,16 +799,16 @@ private getEvohomeLocationStatus(locationId) {
 	try {
 		httpGet(requestParams) { resp ->
 			if(resp.status == 200 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: getEvohomeLocationStatus: Data: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: getEvohomeLocationStatus: Data: ${resp.data}"
 				return resp.data
 			}
 			else {
-				log.error "${app.label}: getEvohomeLocationStatus:  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: getEvohomeLocationStatus:  No Data. Response Status: ${resp.status}"
 				return false
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: getEvohomeLocationStatus: Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: getEvohomeLocationStatus: Error: e.statusCode ${e.statusCode}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -825,7 +825,7 @@ private getEvohomeLocationStatus(locationId) {
  **/
 private getEvohomeZoneStatus(zoneId) {
 
-	if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneStatus(${zoneId})"
+	//if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneStatus(${zoneId})"
 	
 	def requestParams = [
 		'method': 'GET',
@@ -837,16 +837,16 @@ private getEvohomeZoneStatus(zoneId) {
 	try {
 		httpGet(requestParams) { resp ->
 			if(resp.status == 200 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneStatus: Data: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneStatus: Data: ${resp.data}"
 				return resp.data
 			}
 			else {
-				log.error "${app.label}: getEvohomeZoneStatus:  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: getEvohomeZoneStatus:  No Data. Response Status: ${resp.status}"
 				return false
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: getEvohomeZoneStatus: Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: getEvohomeZoneStatus: Error: e.statusCode ${e.statusCode}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -863,7 +863,7 @@ private getEvohomeZoneStatus(zoneId) {
  **/
 private getEvohomeSchedules() {
 
-	log.info "${app.label}: getEvohomeSchedules(): Getting schedules for all zones."
+	//log.info "${app.label}: getEvohomeSchedules(): Getting schedules for all zones."
 			
 	def evohomeSchedules = []
 		
@@ -898,7 +898,7 @@ private getEvohomeSchedules() {
  *
  **/
 private getEvohomeZoneSchedule(zoneId) {
-	if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneSchedule(${zoneId})"
+	//if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneSchedule(${zoneId})"
 	
 	def requestParams = [
 		'method': 'GET',
@@ -910,16 +910,16 @@ private getEvohomeZoneSchedule(zoneId) {
 	try {
 		httpGet(requestParams) { resp ->
 			if(resp.status == 200 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneSchedule: Data: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: getEvohomeZoneSchedule: Data: ${resp.data}"
 				return resp.data
 			}
 			else {
-				log.error "${app.label}: getEvohomeZoneSchedule:  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: getEvohomeZoneSchedule:  No Data. Response Status: ${resp.status}"
 				return false
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: getEvohomeZoneSchedule: Error: e.statusCode ${e.statusCode}"
+		//log.error "${app.label}: getEvohomeZoneSchedule: Error: e.statusCode ${e.statusCode}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -961,7 +961,7 @@ private getEvohomeZoneSchedule(zoneId) {
  **/
 def setThermostatMode(systemId, mode, until=-1) {
 
-	if (atomicState.debug) log.debug "${app.label}: setThermostatMode(): SystemID: ${systemId}, Mode: ${mode}, Until: ${until}"
+	//if (atomicState.debug) log.debug "${app.label}: setThermostatMode(): SystemID: ${systemId}, Mode: ${mode}, Until: ${until}"
 	
 	// Clean mode (translate to index):
 	mode = mode.toLowerCase()
@@ -986,7 +986,7 @@ def setThermostatMode(systemId, mode, until=-1) {
 			modeIndex = 6
 			break
 		default:
-			log.error "${app.label}: setThermostatMode(): Mode: ${mode} is not supported!"
+			//log.error "${app.label}: setThermostatMode(): Mode: ${mode} is not supported!"
 			modeIndex = 999
 			break
 	}
@@ -1019,7 +1019,7 @@ def setThermostatMode(systemId, mode, until=-1) {
 		untilRes = new Date( now() + (Math.round(until) * 86400000) ).format("yyyy-MM-dd'T'00:00:00XX", location.timeZone) // Round down to midnight in the LOCAL timezone.
 	}
 	else {
-		log.warn "${device.label}: setThermostatMode(): until value could not be parsed. Mode will be applied permanently."
+		//log.warn "${device.label}: setThermostatMode(): until value could not be parsed. Mode will be applied permanently."
 		untilRes = 0
 	}
 	
@@ -1032,11 +1032,11 @@ def setThermostatMode(systemId, mode, until=-1) {
 	def body
 	if (0 == untilRes || 'off' == mode || 'auto' == mode) { // Mode is permanent:
 		body = ['SystemMode': modeIndex, 'TimeUntil': null, 'Permanent': 'True']
-		log.info "${app.label}: setThermostatMode(): System ID: ${systemId}, Mode: ${mode}, Permanent: True"
+		//log.info "${app.label}: setThermostatMode(): System ID: ${systemId}, Mode: ${mode}, Permanent: True"
 	}
 	else { // Mode is temporary:
 		body = ['SystemMode': modeIndex, 'TimeUntil': untilRes, 'Permanent': 'False']
-		log.info "${app.label}: setThermostatMode(): System ID: ${systemId}, Mode: ${mode}, Permanent: False, Until: ${untilRes}"
+		//log.info "${app.label}: setThermostatMode(): System ID: ${systemId}, Mode: ${mode}, Permanent: False, Until: ${untilRes}"
 	}
 	
 	def requestParams = [
@@ -1050,16 +1050,16 @@ def setThermostatMode(systemId, mode, until=-1) {
 	try {
 		httpPutJson(requestParams) { resp ->
 			if(resp.status == 201 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: setThermostatMode(): Response: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: setThermostatMode(): Response: ${resp.data}"
 				return null
 			}
 			else {
-				log.error "${app.label}: setThermostatMode():  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: setThermostatMode():  No Data. Response Status: ${resp.status}"
 				return 'error'
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: setThermostatMode(): Error: ${e}"
+		//log.error "${app.label}: setThermostatMode(): Error: ${e}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -1091,7 +1091,7 @@ def setThermostatMode(systemId, mode, until=-1) {
  **/
 def setHeatingSetpoint(zoneId, setpoint, until=-1) {
 
-	if (atomicState.debug) log.debug "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: ${until}"
+	//if (atomicState.debug) log.debug "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: ${until}"
 	
 	// Clean setpoint:
 	setpoint = formatTemperature(setpoint)
@@ -1108,7 +1108,7 @@ def setHeatingSetpoint(zoneId, setpoint, until=-1) {
 		untilRes = new Date().parse("yyyy-MM-dd'T'HH:mm:ssXX", until).format("yyyy-MM-dd'T'HH:mm:00XX", TimeZone.getTimeZone('UTC')) // Round to nearest minute.
 	}
 	else {
-		log.warn "${device.label}: setHeatingSetpoint(): until value could not be parsed. Setpoint will be applied permanently."
+		//log.warn "${device.label}: setHeatingSetpoint(): until value could not be parsed. Setpoint will be applied permanently."
 		untilRes = 0
 	}
 	
@@ -1116,11 +1116,11 @@ def setHeatingSetpoint(zoneId, setpoint, until=-1) {
 	def body
 	if (0 == untilRes) { // Permanent:
 		body = ['HeatSetpointValue': setpoint, 'SetpointMode': 1, 'TimeUntil': null]
-		log.info "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: Permanent"
+		//log.info "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: Permanent"
 	}
 	else { // Temporary:
 		body = ['HeatSetpointValue': setpoint, 'SetpointMode': 2, 'TimeUntil': untilRes]
-		log.info "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: ${untilRes}"
+		//log.info "${app.label}: setHeatingSetpoint(): Zone ID: ${zoneId}, Setpoint: ${setpoint}, Until: ${untilRes}"
 	}
 	
 	def requestParams = [
@@ -1134,16 +1134,16 @@ def setHeatingSetpoint(zoneId, setpoint, until=-1) {
 	try {
 		httpPutJson(requestParams) { resp ->
 			if(resp.status == 201 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: setHeatingSetpoint(): Response: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: setHeatingSetpoint(): Response: ${resp.data}"
 				return null
 			}
 			else {
-				log.error "${app.label}: setHeatingSetpoint():  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: setHeatingSetpoint():  No Data. Response Status: ${resp.status}"
 				return 'error'
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: setHeatingSetpoint(): Error: ${e}"
+		//log.error "${app.label}: setHeatingSetpoint(): Error: ${e}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -1160,7 +1160,7 @@ def setHeatingSetpoint(zoneId, setpoint, until=-1) {
  **/
 def clearHeatingSetpoint(zoneId) {
 
-	log.info "${app.label}: clearHeatingSetpoint(): Zone ID: ${zoneId}"
+	//log.info "${app.label}: clearHeatingSetpoint(): Zone ID: ${zoneId}"
 	
 	// Build request:
 	def requestParams = [
@@ -1174,16 +1174,16 @@ def clearHeatingSetpoint(zoneId) {
 	try {
 		httpPutJson(requestParams) { resp ->
 			if(resp.status == 201 && resp.data) {
-				if (atomicState.debug) log.debug "${app.label}: clearHeatingSetpoint(): Response: ${resp.data}"
+				//if (atomicState.debug) log.debug "${app.label}: clearHeatingSetpoint(): Response: ${resp.data}"
 				return null
 			}
 			else {
-				log.error "${app.label}: clearHeatingSetpoint():  No Data. Response Status: ${resp.status}"
+				//log.error "${app.label}: clearHeatingSetpoint():  No Data. Response Status: ${resp.status}"
 				return 'error'
 			}
 		}
 	} catch (groovyx.net.http.HttpResponseException e) {
-		log.error "${app.label}: clearHeatingSetpoint(): Error: ${e}"
+		//log.error "${app.label}: clearHeatingSetpoint(): Error: ${e}"
 		if (e.statusCode == 401) {
 			atomicState.evohomeAuthFailed = true
 		}
@@ -1238,7 +1238,7 @@ private formatSetpointMode(mode) {
 			mode = 'temporaryOverride'
 			break
 		default:
-			log.error "${app.label}: formatSetpointMode(): Mode: ${mode} unknown!"
+			//log.error "${app.label}: formatSetpointMode(): Mode: ${mode} unknown!"
 			mode = mode.toLowerCase()
 			break
 	}
@@ -1275,7 +1275,7 @@ private formatThermostatMode(mode) {
 			mode = 'off'
 			break
 		default:
-			log.error "${app.label}: formatThermostatMode(): Mode: ${mode} unknown!"
+			//log.error "${app.label}: formatThermostatMode(): Mode: ${mode} unknown!"
 			mode = mode.toLowerCase()
 			break
 	}
@@ -1293,7 +1293,7 @@ private formatThermostatMode(mode) {
  **/
 private getCurrentSwitchpoint(schedule) {
 
-	if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint()"
+	//if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint()"
 	
 	Calendar c = new GregorianCalendar()
 	def ScheduleToday = schedule.dailySchedules.find { it.dayOfWeek = c.getTime().format("EEEE", location.timeZone) }
@@ -1305,7 +1305,7 @@ private getCurrentSwitchpoint(schedule) {
 	
 	if (!currentSwitchPoint) {
 		// There are no current switchpoints today, so we must look for the last Switchpoint yesterday.
-		if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint(): No current switchpoints today, so must look to yesterday's schedule."
+		//if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint(): No current switchpoints today, so must look to yesterday's schedule."
 		c.add(Calendar.DATE, -1 ) // Subtract one DAY.
 		def ScheduleYesterday = schedule.dailySchedules.find { it.dayOfWeek = c.getTime().format("EEEE", location.timeZone) }
 		ScheduleYesterday.switchpoints.sort {it.timeOfDay}
@@ -1317,7 +1317,7 @@ private getCurrentSwitchpoint(schedule) {
 	def localDateStr = c.getTime().format("yyyy-MM-dd'T'", location.timeZone) + currentSwitchPoint.timeOfDay + c.getTime().format("XX", location.timeZone) // Switchpoint in local timezone.
 	def isoDateStr = new Date().parse("yyyy-MM-dd'T'HH:mm:ssXX", localDateStr).format("yyyy-MM-dd'T'HH:mm:ssXX", TimeZone.getTimeZone('UTC')) // Parse and re-format to UTC timezone.    
 	currentSwitchPoint << [ 'time': isoDateStr ]
-	if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint(): Current Switchpoint: ${currentSwitchPoint}"
+	//if (atomicState.debug) log.debug "${app.label}: getCurrentSwitchpoint(): Current Switchpoint: ${currentSwitchPoint}"
 	
 	return currentSwitchPoint
 }
@@ -1332,7 +1332,7 @@ private getCurrentSwitchpoint(schedule) {
  **/
 private getNextSwitchpoint(schedule) {
 
-	if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint()"
+	//if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint()"
 	
 	Calendar c = new GregorianCalendar()
 	def ScheduleToday = schedule.dailySchedules.find { it.dayOfWeek = c.getTime().format("EEEE", location.timeZone) }
@@ -1343,7 +1343,7 @@ private getNextSwitchpoint(schedule) {
 	
 	if (!nextSwitchPoint) {
 		// There are no switchpoints left today, so we must look for the first Switchpoint tomorrow.
-		if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint(): No more switchpoints today, so must look to tomorrow's schedule."
+		//if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint(): No more switchpoints today, so must look to tomorrow's schedule."
 		c.add(Calendar.DATE, 1 ) // Add one DAY.
 		def ScheduleTmrw = schedule.dailySchedules.find { it.dayOfWeek = c.getTime().format("EEEE", location.timeZone) }
 		ScheduleTmrw.switchpoints.sort {it.timeOfDay}
@@ -1354,7 +1354,7 @@ private getNextSwitchpoint(schedule) {
 	def localDateStr = c.getTime().format("yyyy-MM-dd'T'", location.timeZone) + nextSwitchPoint.timeOfDay + c.getTime().format("XX", location.timeZone) // Switchpoint in local timezone.
 	def isoDateStr = new Date().parse("yyyy-MM-dd'T'HH:mm:ssXX", localDateStr).format("yyyy-MM-dd'T'HH:mm:ssXX", TimeZone.getTimeZone('UTC')) // Parse and re-format to UTC timezone.    
 	nextSwitchPoint << [ 'time': isoDateStr ]
-	if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint(): Next Switchpoint: ${nextSwitchPoint}"
+	//if (atomicState.debug) log.debug "${app.label}: getNextSwitchpoint(): Next Switchpoint: ${nextSwitchPoint}"
 	
 	return nextSwitchPoint
 }

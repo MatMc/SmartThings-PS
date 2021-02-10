@@ -89,25 +89,25 @@ metadata {
 // Parse incoming device messages to generate events
 
 def parse(String description) {
-	log.trace description
+	//log.trace description
 	def msg = zigbee.parse(description)
 
     if (description?.startsWith("catchall:")) {
 
-		log.trace msg
-		log.trace "data: $msg.data"
+		//log.trace msg
+		//log.trace "data: $msg.data"
 
         if(description?.endsWith("0100") ||description?.endsWith("1001"))
         {
         	def result = createEvent(name: "switch", value: "on")
-            log.debug "Parse returned ${result?.descriptionText}"
+            //log.debug "Parse returned ${result?.descriptionText}"
             return result
         }
 
         if(description?.endsWith("0000") || description?.endsWith("1000"))
         {
         	def result = createEvent(name: "switch", value: "off")
-            log.debug "Parse returned ${result?.descriptionText}"
+            //log.debug "Parse returned ${result?.descriptionText}"
             return result
         }
 	}
@@ -120,13 +120,13 @@ def parse(String description) {
 		map += [(nameAndValue[0].trim()):nameAndValue[1].trim()]
 		}
 
-        log.debug "Desc Map: $descMap"
+        //log.debug "Desc Map: $descMap"
 
         switch (descMap.cluster) {
 
         	case "0008":
 
-        		log.debug description[-2..-1]
+        		//log.debug description[-2..-1]
         		def i = Math.round(convertHexToInt(descMap.value) / 256 * 100 )
         		sendEvent( name: "level", value: i )
                 sendEvent( name: "switch.setLevel", value: i) //added to help subscribers
@@ -134,7 +134,7 @@ def parse(String description) {
 
          	case "0300":
 
-            	log.debug descMap.value
+            	//log.debug descMap.value
                 def i = Math.round( 1000000 / convertHexToInt(descMap.value))
                	def j = i
                 def bTemp = getBulbTemp(j)
@@ -150,14 +150,14 @@ def parse(String description) {
 }
 
 def on() {
-	log.debug "on()"
+	//log.debug "on()"
 	sendEvent(name: "switch", value: "on")
 
     "st cmd 0x${device.deviceNetworkId} ${endpointId} 6 1 {}"
     }
 
 def off() {
-	log.debug "off()"
+	//log.debug "off()"
 	sendEvent(name: "switch", value: "off")
     sendEvent(name: "level", value: 99)
 	"st cmd 0x${device.deviceNetworkId} ${endpointId} 6 0 {}"
@@ -174,7 +174,7 @@ def refresh() {
 }
 
 def setLevel(value) {
-	log.trace "setLevel($value)"
+	//log.trace "setLevel($value)"
 	def cmds = []
 
 	if (value == 0) {
@@ -196,16 +196,16 @@ def setLevel(value) {
 
 def setColorTemperature(value) {
 
-    log.trace "setColorTemperature($value)"
+    //log.trace "setColorTemperature($value)"
     if (value < 2700) { value = 2700 }
     if (value > 6500) { value = 6500 }
-     log.trace "Color Temperature($value)"
+     //log.trace "Color Temperature($value)"
 
    	def degrees = Math.round(value)
-    log.trace degrees
+    //log.trace degrees
 
     def bulbTemp = getBulbTemp(degrees)
-    log.trace bulbTemp
+    //log.trace bulbTemp
 
 
 
@@ -216,7 +216,7 @@ def setColorTemperature(value) {
 
 	def levelC = swapEndianHex(hexSixteen(1000000/degrees))
 
-    log.trace levelC
+    //log.trace levelC
 
 	cmds << "st cmd 0x${device.deviceNetworkId} ${endpointId} 0x0300 0x0a {${levelC} 2000}"
 
@@ -238,7 +238,7 @@ def updated() {
 def configure() {
 
 	String zigbeeId = swapEndianHex(device.hub.zigbeeId)
-	log.debug "Configuration Reporting and Bindings."
+	//log.debug "Configuration Reporting and Bindings."
 	def configCmds = [
 
         //Switch Reporting
@@ -262,7 +262,7 @@ def configure() {
 
 def uninstalled() {
 
-	log.debug "uninstalled()"
+	//log.debug "uninstalled()"
 
 	response("zcl rftd")
 

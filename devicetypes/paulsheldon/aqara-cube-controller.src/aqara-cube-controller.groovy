@@ -183,7 +183,7 @@ def parse(String description) {
 
 	if (description?.startsWith('enroll request')) {
 		List cmds = enrollResponse()
-		log.debug "enroll response: ${cmds}"
+		//log.debug "enroll response: ${cmds}"
 		result = cmds?.collect { new physicalgraph.device.HubAction(it) }
 	}
 	return result
@@ -195,7 +195,7 @@ private parseCatchAllMessage(String description) {
 	if (shouldProcessMessage(cluster)) {
 		switch(cluster.clusterId) {
 			case 0x0000:
-			log.debug "battery! " + cluster.data + " : " + cluster.data.get(6) + " : " + cluster
+			//log.debug "battery! " + cluster.data + " : " + cluster.data.get(6) + " : " + cluster
 			getBatteryResult(cluster.data.get(6))
 			break
 		}
@@ -224,7 +224,9 @@ private Map parseReportAttributeMessage(String description) {
 	}
 	else if (descMap.cluster == "000C" && descMap.attrId == "ff05") { // Rotation (90 and 180 degrees)
 		getRotationResult(descMap.value)
-	} else { log.debug descMap }
+	} else {
+	    //log.debug descMap
+	}
 
 }
 
@@ -352,7 +354,10 @@ def flipEvents(Integer faceId, String flipType) {
 }
 
 def Map slideEvents(Integer targetFace) {
-	if ( targetFace != device.currentValue("face") as Integer ) { log.info "Stale face data, updating."; setFace(targetFace) }
+	if ( targetFace != device.currentValue("face") as Integer ) {
+	    //log.info "Stale face data, updating.";
+	    setFace(targetFace)
+	}
 	if (!settings.cubeMode || settings.cubeMode in ['0','2'] ) {
 		sendEvent( [
 			name: "button",
@@ -375,7 +380,10 @@ def Map slideEvents(Integer targetFace) {
 }
 
 def knockEvents(Integer targetFace) {
-	if ( targetFace != device.currentValue("face") as Integer ) { log.info "Stale face data, updating."; setFace(targetFace) }
+	if ( targetFace != device.currentValue("face") as Integer ) {
+	    //log.info "Stale face data, updating.";
+	    setFace(targetFace)
+	}
 	if (!settings.cubeMode || settings.cubeMode in ['0','2'] ) {
 		sendEvent( [
 			name: "button",
@@ -444,13 +452,13 @@ def rotateEvents(Integer angle) {
 
 def configure() {
 	String zigbeeEui = swapEndianHex(device.hub.zigbeeEui)
-	log.debug "Configuring Reporting, IAS CIE, and Bindings."
+	//log.debug "Configuring Reporting, IAS CIE, and Bindings."
 	def configCmds = []
 	return configCmds + refresh() // send refresh cmds as part of config
 }
 
 def enrollResponse() {
-	log.debug "Sending enroll response"
+	//log.debug "Sending enroll response"
 }
 
 def reset() {
